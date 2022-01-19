@@ -1,0 +1,47 @@
+.field {
+  border: 2px solid black;
+  height: 40px;
+  width: 40px;
+  font-size: 30px;
+  vertical-align: middle;
+  text-align: center;
+  display: table-cell;
+}
+
+.row {
+  display: table-row;
+}
+
+.gameboard {
+  display: table;
+  border-collapse: collapse;
+}
+.result {
+  margin: 4px;
+  height: 32px;
+}
+body {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+button {
+  margin: 4px;
+  display: block;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+}
+
+.win {
+  background-color: lightgreen;
+}
