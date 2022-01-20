@@ -45,7 +45,6 @@ const gameboard = (() => {
           if (fields[adress].content === "empty") {
             fields[adress].content = "✕";
             fieldElements[adress].textContent = "✕";
-            console.log(fieldElements[adress]);
             for (winField of combination) {
               fieldElements[winField].classList.add("win");
             }
@@ -94,7 +93,7 @@ const gameboard = (() => {
           }
         }
       }
-      console.log(attractiveness);
+      console.log("attractivenes", attractiveness);
       for (let i = 0; i < attractiveness.length; i++) {
         if (maxValue < attractiveness[i]) {
           maxValue = attractiveness[i];
@@ -110,10 +109,11 @@ const gameboard = (() => {
       );
     }
     if (canMove) {
+      console.log("fourth");
       loop3: for (let i = 0; i < fields.length; i++) {
         if (fields[i].content === "empty") {
           fields[i].content = "✕";
-          fieldElements[adress].textContent = "✕";
+          fieldElements[i].textContent = "✕";
           numberOfMoves++;
           playerWinCombinations = playerWinCombinations.filter(
             (c) => !c.includes(i)
@@ -122,6 +122,7 @@ const gameboard = (() => {
         }
       }
     }
+    console.log(numberOfMoves);
     if (numberOfMoves === 9) {
       resultElement.textContent = "TIE";
     }
@@ -135,11 +136,12 @@ const gameboard = (() => {
       event.target.textContent = mark;
       previousPlayerMove = +pressedField;
       mark = "✕";
-      console.log(pressedField);
+      numberOfMoves++;
       computerWinCombinations = computerWinCombinations.filter(
         (c) => !c.includes(+pressedField)
       );
       console.log(computerWinCombinations);
+      console.log(numberOfMoves);
       computerMove();
     }
   };
@@ -160,11 +162,20 @@ const gameboard = (() => {
       computerWinCombinations[i] = [...allWinCombinations[i]];
       playerWinCombinations[i] = [...allWinCombinations[i]];
     }
-    computerMove();
+    firstMove();
   };
 
   restartButton.addEventListener("click", reset);
-
+  const firstMove = () => {
+    const addressOfFirstMove = Math.ceil(Math.random() * 9) - 1;
+    console.log(1);
+    fieldElements[addressOfFirstMove].textContent = "✕";
+    fields[addressOfFirstMove].content = "✕";
+    numberOfMoves++;
+    playerWinCombinations = playerWinCombinations.filter(
+      (c) => !c.includes(addressOfFirstMove)
+    );
+  };
   for (let i = 0; i < 9; i++) {
     fields[i] = { winCombinations: [] };
     fields[i].content = "empty";
@@ -172,7 +183,7 @@ const gameboard = (() => {
       fields[i].winCombinations.push([...combination]);
     }
   }
-  computerMove();
 
+  firstMove();
   return {};
 })();
