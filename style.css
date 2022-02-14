@@ -4,15 +4,15 @@ body {
 }
 :root {
   font-family: sans-serif;
+  text-transform: uppercase;
 }
 body {
   margin: 0;
 }
 .container {
   min-height: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr auto auto auto 1fr;
+  display: flex;
+  flex-direction: column;
   justify-items: center;
   align-items: center;
   gap: 2vmin;
@@ -43,11 +43,11 @@ body {
 }
 
 button {
-  font-size: 5vmin;
+  font-size: 3vmin;
   font-weight: bold;
-  height: 10vmin;
+  height: 6vmin;
   border: none;
-  padding: 2vmin 4vmin;
+  padding: 1vmin 4vmin;
   background-color: darkslategrey;
   color: beige;
 }
@@ -64,7 +64,12 @@ button {
   font-size: 7vmin;
   height: 10vmin;
   width: 20vmin;
-  border: 1vmin solid lightskyblue;
+}
+.blue {
+  background-color: lightskyblue;
+}
+.orange {
+  background-color: orange;
 }
 .score svg {
   height: 100%;
@@ -73,4 +78,49 @@ button {
 
 .win {
   background-color: rgb(94, 236, 153);
+}
+
+.choose-mode {
+  display: flex;
+  gap: 4vmin;
+  align-items: center;
+  justify-items: center;
+  margin: auto;
+}
+.choose-mode > div {
+  background-color: black;
+  color: white;
+  padding: 2vmin;
+  font-weight: bold;
+  font-size: 5vmin;
+  text-align: center;
+}
+
+.choose-figure {
+  display: flex;
+  gap: 4vmin;
+  margin: auto;
+}
+.choose-figure > div {
+  background-color: black;
+  padding: 1vmin;
+  height: 20vmin;
+}
+.choose-figure svg {
+  height: 100%;
+}
+.choose-figure path {
+  fill: white;
+}
+.game {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  justify-items: center;
+  align-items: center;
+  gap: 2vmin;
+  margin: auto;
+}
+.hidden {
+  display: none;
 }

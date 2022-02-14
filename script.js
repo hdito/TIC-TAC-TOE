@@ -31,19 +31,24 @@ noughtPath.setAttribute(
 );
 noughtPath.setAttribute("fill", "#0D0D0D");
 noughtSVG.appendChild(noughtPath);
+const SVG = { cross: crossSVG, nought: noughtSVG };
+let numberOfMoves;
 
-let numberOfMoves = 0;
+let score = { cross: 0, nought: 0 };
+let turnFigure;
+let pressedField;
+let gameFinished;
+let playerChoice;
+const scoreElement = document.querySelector(".score");
 
-let crossesScore = 0;
-let noughtsScore = 0;
-
-const computerScore = document.querySelector(".score>div>div");
-const playerScore = document.querySelector(
+const crossScoreElement = document.querySelector(".score>div>div");
+const noughtScoreElement = document.querySelector(
   ".score>div:nth-child(2)>div"
 );
+
 function showScore() {
-  computerScore.textContent = crossesScore;
-  playerScore.textContent = noughtsScore;
+  crossScoreElement.textContent = score.cross;
+  noughtScoreElement.textContent = score.nought;
 }
 
 const fields = [];
@@ -62,50 +67,71 @@ const allWinCombinations = [
   [2, 4, 6],
 ];
 
-let computerWinCombinations = [];
-let playerWinCombinations = [];
+let crossWinCombinations = [];
+let noughtWinCombinations = [];
+let gameCombinations = {};
 
-for (combination of allWinCombinations) {
-  computerWinCombinations.push([...combination]);
-  playerWinCombinations.push([...combination]);
+function gameInit() {
+  crossWinCombinations = [];
+  noughtWinCombinations = [];
+  for (combination of allWinCombinations) {
+    crossWinCombinations.push([...combination]);
+    noughtWinCombinations.push([...combination]);
+  }
+  gameCombinations.cross = crossWinCombinations;
+  gameCombinations.nought = noughtWinCombinations;
+  turnFigure = "cross";
+  numberOfMoves = 0;
+  gameFinished = false;
+  for (let i = 0; i < 9; i++) {
+    fields[i] = "empty";
+  }
 }
 
 function chooseField() {
-  for (let combination of computerWinCombinations) {
+  for (let combination of gameCombinations[turnFigure]) {
     let completeness = 0;
     for (adress of combination) {
-      if (fields[adress].content === "cross") {
-        completeness++;
-      }
-    }
-    if (completeness === 2) {
-      for (adress of combination) {
-        if (fields[adress].content === "empty") return adress;
-      }
-    }
-  }
-  for (combination of playerWinCombinations) {
-    let completeness = 0;
-    for (adress of combination) {
-      if (fields[adress] === "nought") {
+      if (fields[adress] === turnFigure) {
         completeness++;
       }
     }
     if (completeness === 2) {
       for (adress of combination) {
         if (fields[adress] === "empty") {
+          console.log("First");
           return adress;
         }
       }
     }
   }
-  if (computerWinCombinations.length) {
+  for (key in gameCombinations) {
+    if (key !== turnFigure) {
+      for (combination of gameCombinations[key]) {
+        let completeness = 0;
+        for (adress of combination) {
+          if (fields[adress] === key) {
+            completeness++;
+          }
+        }
+        if (completeness === 2) {
+          for (adress of combination) {
+            if (fields[adress] === "empty") {
+              console.log("second");
+              return adress;
+            }
+          }
+        }
+      }
+    }
+  }
+  if (gameCombinations[turnFigure].length) {
     let attractiveness = new Array(9).fill(0);
     let maxValue = 0;
     let index = 0;
-    for (combination of computerWinCombinations) {
+    for (combination of gameCombinations[turnFigure]) {
       for (adress of combination) {
-        if (fields[adress].content === "empty") {
+        if (fields[adress] === "empty") {
           attractiveness[adress]++;
         }
       }
@@ -116,117 +142,199 @@ function chooseField() {
         index = i;
       }
     }
+    console.log("third");
     return index;
   }
-  for (let i = 0; i < fields.length(); i++) {
-    if (fields[i].content === "empty") {
+  for (let i = 0; i < fields.length; i++) {
+    if (fields[i] === "empty") {
+      console.log("fourth");
       return i;
     }
   }
 }
 
 function computerMakeMove(adress) {
-  console.log(fieldElements, adress);
-  fieldElements[adress].appendChild(crossSVG.cloneNode(true));
-  fields[adress].content = "cross";
-  playerWinCombinations = playerWinCombinations.filter(
-    (combination) => !combination.includes(adress)
-  );
-}
-
-function playerMakeMove(event) {
-  const pressedField = event.target.getAttribute("id");
-  console.log(fields[pressedField]);
-  if (fields[pressedField].content !== "empty") {
-    return;
+  let temp = turnFigure;
+  fields[adress] = turnFigure;
+  if (turnFigure === "cross") {
+    turnFigure = "nought";
+  } else {
+    turnFigure = "cross";
   }
-  fields[pressedField].content = "nought";
-  fieldElements[pressedField].appendChild(noughtSVG.cloneNode(true));
-  computerWinCombinations = computerWinCombinations.filter(
-    (combination) => !combination.includes(pressedField)
+  gameCombinations[turnFigure] = gameCombinations[turnFigure].filter(
+    (combination) => !combination.includes(Number(adress))
   );
-  numberOfMoves++;
+
+  if (numberOfMoves > 4) {
+    for (let combination of gameCombinations[temp]) {
+      if (
+        fields[combination[0]] === fields[combination[1]] &&
+        fields[combination[1]] === fields[combination[2]] &&
+        fields[combination[0]] === temp
+      ) {
+        console.log(`${temp} win!`);
+        for (let index of combination) {
+          fieldElements[index].classList.add("win");
+        }
+        gameFinished = true;
+        fieldElements[adress].appendChild(SVG[temp].cloneNode(true));
+        score[temp]++;
+        showScore();
+        return;
+      }
+    }
+  }
+  fieldElements[adress].appendChild(SVG[temp].cloneNode(true));
 }
 
 const reset = () => {
-  numberOfMoves = 0;
-
   for (let i = 0; i < 9; i++) {
-    fields[i].content = "empty";
+    fields[i] = "empty";
     fieldElements[i].textContent = "";
     fieldElements[i].classList = "field";
-    fieldElements[i].addEventListener("click", playerMakeMove);
   }
-  for (let i = 0; i < allWinCombinations.length; i++) {
-    computerWinCombinations[i] = [...allWinCombinations[i]];
-    playerWinCombinations[i] = [...allWinCombinations[i]];
-  }
+  gameInit();
 };
 
 restartButton.addEventListener("click", reset);
+
 function chooseFirstMove() {
-  const addressOfFirstMove = Math.ceil(Math.random() * 9) - 1;
-  return addressOfFirstMove;
-}
-for (let i = 0; i < 9; i++) {
-  fields[i] = { winCombinations: [] };
-  fields[i].content = "empty";
-  for (combination of allWinCombinations) {
-    fields[i].winCombinations.push([...combination]);
+  let addressFirstMove = Math.ceil(Math.random() * 9) - 1;
+  while (fields[addressFirstMove] !== "empty") {
+    addressFirstMove = Math.ceil(Math.random() * 9) - 1;
   }
+  return addressFirstMove;
 }
 
-for (let field of fieldElements) {
-  field.addEventListener("click", playerMakeMove);
-}
-
-function checkForWin() {
-  for (let combination of computerWinCombinations) {
-    if (
-      fields[combination[0]].content ===
-        fields[combination[1]].content &&
-      fields[combination[1]].content ===
-        fields[combination[2]].content &&
-      fields[combination[0]].content === "cross"
-    ) {
-      for (let adress of combination) {
-        fieldElements[adress].classList.add("win");
-      }
-      for (let fieldElement of fieldElements) {
-        fieldElement.removeEventListener("click", playerMakeMove);
-      }
-      crossesScore++;
-      showScore();
-      return;
-    }
-  }
-}
-function checkForTie() {
-  if (numberOfMoves === 9) {
-    for (let fieldElement of fieldElements) {
-      fieldElement.removeEventListener("click", playerMakeMove);
-    }
-  }
-}
-
-function gameController() {
-  if (numberOfMoves === 0) {
-    computerMakeMove(chooseFirstMove());
-    numberOfMoves++;
-  } else if (numberOfMoves % 2 === 0) {
-    numberOfMoves++;
-    computerMakeMove(chooseField());
-    checkForWin();
-    checkForTie();
-  }
-}
-gameController();
-function callback() {
-  gameController();
-}
-const observer = new MutationObserver(callback);
+const chooseModeScreen = document.querySelector(".choose-mode");
+const chooseFigureScreen = document.querySelector(".choose-figure");
+const gameScreen = document.querySelector(".game");
+const observer = new MutationObserver(computerController);
 const observerOptions = {
   childList: true,
   subtree: true,
 };
-observer.observe(document.querySelector(".gameboard"), observerOptions);
+chooseModeScreen.children[0].addEventListener("click", function () {
+  chooseModeScreen.classList.toggle("hidden");
+  gameScreen.classList.toggle("hidden");
+  gameInit();
+  for (let field of fieldElements) {
+    field.addEventListener("click", playerVersusPlayerController);
+  }
+});
+chooseModeScreen.children[1].addEventListener("click", function () {
+  chooseModeScreen.classList.toggle("hidden");
+  chooseFigureScreen.classList.toggle("hidden");
+  for (child of chooseFigureScreen.children) {
+    child.addEventListener("click", pvcInit);
+  }
+});
+
+function pvcInit(choice) {
+  let choiceElement = choice.target;
+  while (choiceElement.nodeName !== "DIV") {
+    choiceElement = choiceElement.parentElement;
+  }
+  playerChoice = choiceElement.classList.value;
+  if (playerChoice !== "cross") {
+    scoreElement.children[0].classList.toggle("blue");
+    scoreElement.children[0].classList.toggle("orange");
+    scoreElement.children[1].classList.toggle("blue");
+    scoreElement.children[1].classList.toggle("orange");
+  }
+  chooseFigureScreen.classList.toggle("hidden");
+  gameScreen.classList.toggle("hidden");
+  gameInit();
+  for (let field of fieldElements) {
+    field.addEventListener("click", playerVersusPlayerController);
+  }
+
+  observer.observe(
+    document.querySelector(".gameboard"),
+    observerOptions
+  );
+  computerController();
+}
+
+function computerController() {
+  if (turnFigure === playerChoice || numberOfMoves > 8) {
+    return;
+  }
+  numberOfMoves++;
+  console.log(numberOfMoves);
+  let adress;
+  if (numberOfMoves < 3) {
+    adress = chooseFirstMove();
+  } else adress = chooseField();
+
+  computerMakeMove(adress);
+}
+
+function endController() {
+  if (numberOfMoves > 4) {
+    for (let combination of gameCombinations[turnFigure]) {
+      console.log(combination);
+      if (
+        fields[combination[0]] === fields[combination[1]] &&
+        fields[combination[1]] === fields[combination[2]] &&
+        fields[combination[0]] === turnFigure
+      ) {
+        console.log(`${turnFigure} win!`);
+        for (let adress of combination) {
+          fieldElements[adress].classList.add("win");
+        }
+        gameFinished = true;
+        score[turnFigure]++;
+        showScore();
+        return;
+      } else if (numberOfMoves === 9) {
+        gameFinished = true;
+        return;
+      }
+    }
+  }
+  if (turnFigure === "cross") {
+    turnFigure = "nought";
+  } else {
+    turnFigure = "cross";
+  }
+  console.log(gameCombinations);
+  gameCombinations[turnFigure] = gameCombinations[turnFigure].filter(
+    (combination) => !combination.includes(Number(pressedField))
+  );
+}
+
+function playerVersusPlayerController(event) {
+  pressedField = event.target.getAttribute("id");
+  if (fields[pressedField] !== "empty" || gameFinished) {
+    return;
+  }
+  numberOfMoves++;
+  console.log(numberOfMoves);
+
+  fields[pressedField] = turnFigure;
+  let temp = turnFigure;
+  endController();
+  fieldElements[pressedField].appendChild(SVG[temp].cloneNode(true));
+}
+
+const mainMenuButton = document.querySelectorAll("button")[1];
+mainMenuButton.addEventListener("click", function () {
+  chooseModeScreen.classList.toggle("hidden");
+  gameScreen.classList.toggle("hidden");
+  for (let field of fieldElements) {
+    field.removeEventListener("click", playerVersusPlayerController);
+  }
+  observer.disconnect();
+  for (let key in score) {
+    score[key] = 0;
+  }
+  showScore();
+  if (scoreElement.children[0].classList.contains("orange")) {
+    scoreElement.children[0].classList.toggle("blue");
+    scoreElement.children[0].classList.toggle("orange");
+    scoreElement.children[1].classList.toggle("blue");
+    scoreElement.children[1].classList.toggle("orange");
+  }
+  reset();
+});
