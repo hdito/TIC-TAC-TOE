@@ -4,44 +4,50 @@
     <meta charset="UTF-8" />
     <title>TIC TAC TOE</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="script.js" defer></script>
+    <script type="module" src="script.js" defer></script>
   </head>
   <body>
     <div class="container">
-      <div class="choose-mode">
-        <div>
-          <span>Player<br />versus<br />player</span>
-        </div>
-        <div>
-          <span>Player<br />versus <br />computer</span>
+      <div class="choose-gamemode">
+        <h1>Choose gamemode</h1>
+        <div class="buttons">
+          <button data-action="pvp">
+            Player<br />versus<br />player
+          </button>
+          <button data-action="pvc">
+            Player<br />versus <br />computer
+          </button>
         </div>
       </div>
       <div class="choose-figure hidden">
-        <div class="cross">
-          <svg
-            fill="none"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
+        <h1>Choose your figure</h1>
+        <div class="buttons">
+          <button data-action="cross">
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
-              d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z"
-              fill="#0D0D0D"
-            ></path>
-          </svg>
-        </div>
-        <div class="nought">
-          <svg
-            fill="none"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
+            >
+              <path
+                xmlns="http://www.w3.org/2000/svg"
+                d="M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z"
+                fill="#0D0D0D"
+              ></path>
+            </svg>
+          </button>
+          <button data-action="nought">
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
-              d="M12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z"
-              fill="#0D0D0D"
-            ></path>
-          </svg>
+            >
+              <path
+                xmlns="http://www.w3.org/2000/svg"
+                d="M12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z"
+                fill="#0D0D0D"
+              ></path>
+            </svg>
+          </button>
         </div>
       </div>
       <div class="game hidden">
@@ -58,7 +64,7 @@
                 fill="#0D0D0D"
               ></path>
             </svg>
-            <div>0</div>
+            <span class="cross-score">0</span>
           </div>
           <div class="orange">
             <svg
@@ -72,24 +78,24 @@
                 fill="#0D0D0D"
               ></path>
             </svg>
-            <div>0</div>
+            <span class="nought-score">0</span>
           </div>
         </div>
         <div class="gameboard">
-          <div class="field" id="0"></div>
-          <div class="field" id="1"></div>
-          <div class="field" id="2"></div>
+          <div data-value="empty" class="field" id="0"></div>
+          <div data-value="empty" class="field" id="1"></div>
+          <div data-value="empty" class="field" id="2"></div>
 
-          <div class="field" id="3"></div>
-          <div class="field" id="4"></div>
-          <div class="field" id="5"></div>
+          <div data-value="empty" class="field" id="3"></div>
+          <div data-value="empty" class="field" id="4"></div>
+          <div data-value="empty" class="field" id="5"></div>
 
-          <div class="field" id="6"></div>
-          <div class="field" id="7"></div>
-          <div class="field" id="8"></div>
+          <div data-value="empty" class="field" id="6"></div>
+          <div data-value="empty" class="field" id="7"></div>
+          <div data-value="empty" class="field" id="8"></div>
         </div>
-        <button>RESTART</button>
-        <button>MAIN MENU</button>
+        <button data-action="restart">RESTART</button>
+        <button data-action="main-menu">MAIN MENU</button>
       </div>
     </div>
   </body>
